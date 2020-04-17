@@ -68,7 +68,7 @@ bool TTAHelper::initialize()
 
 int TTAHelper::totalTime() const
 {
-    return m_info->tta.LENGTH;
+    return m_info->tta.LENGTH * 1000;
 }
 
 void TTAHelper::seek(qint64 time)

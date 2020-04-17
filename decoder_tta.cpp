@@ -53,11 +53,6 @@ qint64 DecoderTTA::totalTime() const
     return m_tta->totalTime();
 }
 
-void DecoderTTA::seek(qint64 pos)
-{
-    m_tta->seek(pos);
-}
-
 int DecoderTTA::bitrate() const
 {
     return m_tta->bitrate();
@@ -66,4 +61,9 @@ int DecoderTTA::bitrate() const
 qint64 DecoderTTA::read(unsigned char *data, qint64 size)
 {
     return m_tta->read(data, size);
+}
+
+void DecoderTTA::seek(qint64 pos)
+{
+    m_tta->seek(pos);
 }
