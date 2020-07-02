@@ -38,24 +38,25 @@ DecoderProperties DecoderTTAFactory::properties() const
     return properties;
 }
 
-Decoder *DecoderTTAFactory::create(const QString &path, QIODevice *)
+Decoder *DecoderTTAFactory::create(const QString &path, QIODevice *input)
 {
+    Q_UNUSED(input);
     return new DecoderTTA(path);
 }
 
-QList<TrackInfo *> DecoderTTAFactory::createPlayList(const QString &path, TrackInfo::Parts parts, QStringList *)
+QList<TrackInfo*> DecoderTTAFactory::createPlayList(const QString &path, TrackInfo::Parts parts, QStringList *)
 {
     TrackInfo *info = new TrackInfo(path);
 
-    if(parts == TrackInfo::NoParts)
+    if(parts == TrackInfo::Parts())
     {
-        return QList<TrackInfo *>() << info;
+        return QList<TrackInfo*>() << info;
     }
 
     TTAHelper helper(path);
     if(!helper.initialize())
     {
-        return QList<TrackInfo *>();
+        return QList<TrackInfo*>();
     }
 
     if(parts & TrackInfo::MetaData)
@@ -76,13 +77,15 @@ QList<TrackInfo *> DecoderTTAFactory::createPlayList(const QString &path, TrackI
         info->setValue(Qmmp::SAMPLERATE, helper.samplerate());
         info->setValue(Qmmp::CHANNELS, helper.channels());
         info->setValue(Qmmp::BITS_PER_SAMPLE, helper.bitsPerSample());
+        info->setValue(Qmmp::FORMAT_NAME, "tta");
         info->setDuration(helper.totalTime());
     }
 
-    return QList<TrackInfo *>() << info;
+    return QList<TrackInfo*>() << info;
 }
 
-MetaDataModel* DecoderTTAFactory::createMetaDataModel(const QString &path, bool)
+MetaDataModel* DecoderTTAFactory::createMetaDataModel(const QString &path, bool readOnly)
 {
+    Q_UNUSED(readOnly);
     return new TTAMetaDataModel(path);
 }
