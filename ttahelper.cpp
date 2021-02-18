@@ -1,21 +1,3 @@
-/* =================================================
- * This file is part of the TTK qmmp plugin project
- * Copyright (C) 2015 - 2020 Greedysky Studio
-
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3 of the License, or
- * (at your option) any later version.
-
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
-
- * You should have received a copy of the GNU General Public License along
- * with this program; If not, see <http://www.gnu.org/licenses/>.
- ================================================= */
-
 #include "ttahelper.h"
 
 extern "C" {
@@ -61,7 +43,6 @@ bool TTAHelper::initialize()
 
     m_info->startsample = 0;
     m_info->endsample = m_info->tta.DATALENGTH - 1;
-    m_info->readpos = 0;
 
     return true;
 }
@@ -73,16 +54,21 @@ int TTAHelper::totalTime() const
 
 void TTAHelper::seek(qint64 time)
 {
-    const int sample = time * samplerate();
-    m_info->samples_to_skip = set_position(&m_info->tta, sample + m_info->startsample);
+    const int total = totalTime();
+    if(total == 0 || m_info->endsample == 0)
+    {
+        return;
+    }
+
+    const int sample = time * 1.0 / total * m_info->endsample;
+    m_info->samples_to_skip = set_position(&m_info->tta, sample);
     if(m_info->samples_to_skip < 0)
     {
         return;
     }
 
-    m_info->currentsample = sample + m_info->startsample;
+    m_info->currentsample = sample;
     m_info->remaining = 0;
-    m_info->readpos = sample / samplerate();
 }
 
 int TTAHelper::bitrate() const
@@ -90,7 +76,7 @@ int TTAHelper::bitrate() const
     return m_info->tta.BITRATE;
 }
 
-int TTAHelper::samplerate() const
+int TTAHelper::sampleRate() const
 {
     return m_info->tta.SAMPLERATE;
 }
@@ -188,8 +174,15 @@ QVariantMap TTAHelper::readTags(stdio_meta_type stdio_meta)
     {
         do
         {
+            if(!item->key || !item->value)
+            {
+                item = item->next;
+                continue;
+            }
+
             data.insert(item->key, item->value);
-        } while(item->next);
+            item = item->next;
+        } while(item);
         free(item);
     }
 
