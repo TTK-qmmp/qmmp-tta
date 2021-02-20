@@ -33,11 +33,13 @@ bool TTAHelper::initialize()
 {
     if(open_tta_file(m_path.toLocal8Bit().constData(), &m_info->tta, 0) != 0)
     {
+        qWarning("TTAHelper: open_tta_file failed");
         return false;
     }
 
     if(player_init(&m_info->tta) != 0)
     {
+        qWarning("TTAHelper: player_init invalid");
         return false;
     }
 
@@ -158,32 +160,38 @@ QVariantMap TTAHelper::readTags(stdio_meta_type stdio_meta)
         return QVariantMap();
     }
 
-    metaInfo_t *item = (metaInfo_t*)malloc(sizeof(metaInfo_t));
+    metaInfo_t *item = (metaInfo_t*)calloc(sizeof(metaInfo_t), 1);
+    item->key = ":MODULE";
+    item->value = "TTA";
+
     switch(stdio_meta)
     {
-    case 0: stdio_apev2_read(item, nullptr, file); break;
-    case 1: stdio_id3v2_read(item, nullptr, file); break;
-    case 2: stdio_id3v1_read(item, file); break;
-    default: break;
+        case meta_apev2: stdio_apev2_read(item, nullptr, file); break;
+        case meta_id3v2: stdio_id3v2_read(item, nullptr, file); break;
+        case meta_id3v1: stdio_id3v1_read(item, file); break;
+        case meta_all:
+        {
+            stdio_apev2_read(item, nullptr, file);
+            stdio_id3v2_read(item, nullptr, file);
+            stdio_id3v1_read(item, file);
+        }
     }
 
     fclose(file);
 
     QVariantMap data;
-    if(item)
+    while(item)
     {
-        do
+        if(!item->key || !item->value)
         {
-            if(!item->key || !item->value)
-            {
-                item = item->next;
-                continue;
-            }
-
-            data.insert(item->key, item->value);
             item = item->next;
-        } while(item);
+            continue;
+        }
+
+        data.insert(item->key, item->value);
+        metaInfo_t *next = item->next;
         free(item);
+        item = next;
     }
 
     return data;

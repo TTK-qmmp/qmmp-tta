@@ -16,13 +16,15 @@ bool DecoderTTA::initialize()
 {
     if(!m_tta->initialize())
     {
+        qWarning("DecoderTTA: initialize failed");
         return false;
     }
 
-    int rate = m_tta->samplerate();
-    int channels = m_tta->channels();
+    const int rate = m_tta->sampleRate();
+    const int channels = m_tta->channels();
     if(rate == 0 || channels == 0)
     {
+        qWarning("DecoderTTA: rate or channel invalid");
         return false;
     }
 

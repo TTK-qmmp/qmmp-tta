@@ -43,7 +43,7 @@ QList<TrackInfo*> DecoderTTAFactory::createPlayList(const QString &path, TrackIn
 
     if(parts & TrackInfo::MetaData)
     {
-        const QVariantMap &meta = helper.readTags(stdio_id3v2);
+        const QVariantMap &meta = helper.readTags(meta_all);
         info->setValue(Qmmp::ALBUM, meta.value("album", QString()));
         info->setValue(Qmmp::ARTIST, meta.value("artist", QString()));
         info->setValue(Qmmp::COMMENT, meta.value("comment", QString()));
