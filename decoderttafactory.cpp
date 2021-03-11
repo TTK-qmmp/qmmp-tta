@@ -3,6 +3,8 @@
 #include "decoderttafactory.h"
 #include "ttametadatamodel.h"
 
+#include <QMessageBox>
+
 bool DecoderTTAFactory::canDecode(QIODevice *) const
 {
     return false;
@@ -70,4 +72,21 @@ MetaDataModel* DecoderTTAFactory::createMetaDataModel(const QString &path, bool 
 {
     Q_UNUSED(readOnly);
     return new TTAMetaDataModel(path);
+}
+
+void DecoderTTAFactory::showSettings(QWidget *parent)
+{
+    Q_UNUSED(parent);
+}
+
+void DecoderTTAFactory::showAbout(QWidget *parent)
+{
+    QMessageBox::about (parent, tr("About TTA Reader Plugin"),
+                        tr("Qmmp TTA Reader Plugin")+"\n"+
+                        tr("Written by: Greedysky <greedysky@163.com>"));
+}
+
+QString DecoderTTAFactory::translation() const
+{
+    return QString();
 }

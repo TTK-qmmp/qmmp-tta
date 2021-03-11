@@ -4,9 +4,9 @@ TTAMetaDataModel::TTAMetaDataModel(const QString &path) :
     MetaDataModel(true)
 {
     m_tta = new TTAHelper(path);
-    m_tags << new TTAFileTagModel(m_tta, stdio_id3v1);
-    m_tags << new TTAFileTagModel(m_tta, stdio_id3v2);
-    m_tags << new TTAFileTagModel(m_tta, stdio_apev2);
+    m_tags << new TTAFileTagModel(m_tta, meta_id3v1);
+    m_tags << new TTAFileTagModel(m_tta, meta_id3v2);
+    m_tags << new TTAFileTagModel(m_tta, meta_apev2);
 }
 
 TTAMetaDataModel::~TTAMetaDataModel()
@@ -34,9 +34,9 @@ TTAFileTagModel::~TTAFileTagModel()
 
 QString TTAFileTagModel::name() const
 {
-    if(m_stdio_meta == stdio_id3v1)
+    if(m_stdio_meta == meta_id3v1)
         return "ID3v1";
-    else if(m_stdio_meta == stdio_id3v2)
+    else if(m_stdio_meta == meta_id3v2)
         return "ID3v2";
     return "APE";
 }
@@ -44,9 +44,9 @@ QString TTAFileTagModel::name() const
 QList<Qmmp::MetaData> TTAFileTagModel::keys() const
 {
     QList<Qmmp::MetaData> list = TagModel::keys();
-    if(m_stdio_meta == stdio_id3v2)
+    if(m_stdio_meta == meta_id3v2)
         return list;
-    else if(m_stdio_meta == stdio_apev2)
+    else if(m_stdio_meta == meta_apev2)
     {
         list.removeAll(Qmmp::DISCNUMBER);
         return list;
