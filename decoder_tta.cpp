@@ -29,7 +29,7 @@ bool DecoderTTA::initialize()
     }
 
     configure(rate, channels, Qmmp::PCM_S16LE);
-
+    qDebug("DecoderTTA: initialize succes");
     return true;
 }
 
