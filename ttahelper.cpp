@@ -15,10 +15,10 @@ TTAHelper::TTAHelper(const QString &url)
 
 TTAHelper::~TTAHelper()
 {
-    close();
+    deinit();
 }
 
-void TTAHelper::close()
+void TTAHelper::deinit()
 {
     if(m_info)
     {

@@ -4,24 +4,24 @@
 DecoderTTA::DecoderTTA(const QString &path)
     : Decoder()
 {
-    m_tta = new TTAHelper(path);
+    m_helper = new TTAHelper(path);
 }
 
 DecoderTTA::~DecoderTTA()
 {
-    delete m_tta;
+    delete m_helper;
 }
 
 bool DecoderTTA::initialize()
 {
-    if(!m_tta->initialize())
+    if(!m_helper->initialize())
     {
         qWarning("DecoderTTA: initialize failed");
         return false;
     }
 
-    const int rate = m_tta->sampleRate();
-    const int channels = m_tta->channels();
+    const int rate = m_helper->sampleRate();
+    const int channels = m_helper->channels();
     if(rate == 0 || channels == 0)
     {
         qWarning("DecoderTTA: rate or channel invalid");
@@ -35,20 +35,20 @@ bool DecoderTTA::initialize()
 
 qint64 DecoderTTA::totalTime() const
 {
-    return m_tta->totalTime();
+    return m_helper->totalTime();
 }
 
 int DecoderTTA::bitrate() const
 {
-    return m_tta->bitrate();
+    return m_helper->bitrate();
 }
 
 qint64 DecoderTTA::read(unsigned char *data, qint64 size)
 {
-    return m_tta->read(data, size);
+    return m_helper->read(data, size);
 }
 
 void DecoderTTA::seek(qint64 pos)
 {
-    m_tta->seek(pos);
+    m_helper->seek(pos);
 }

@@ -40,7 +40,7 @@ public:
     virtual void seek(qint64 time) override;
 
 private:
-    TTAHelper* m_tta;
+    TTAHelper* m_helper;
 };
 
-#endif // DECODER_TTA_H
+#endif

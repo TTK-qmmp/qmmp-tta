@@ -33,7 +33,7 @@ public:
 
 private:
     QList<TagModel* > m_tags;
-    TTAHelper* m_tta;
+    TTAHelper* m_helper;
 };
 
 class TTAFileTagModel : public TagModel
@@ -48,8 +48,8 @@ public:
     virtual void setValue(Qmmp::MetaData key, const QString &value) override;
 
 private:
-    TTAHelper* m_tta;
+    TTAHelper* m_helper;
     stdio_meta_type m_stdio_meta;
 };
 
-#endif // TTAMETADATAMODEL_H
+#endif

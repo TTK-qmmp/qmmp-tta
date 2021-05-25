@@ -3,17 +3,17 @@
 TTAMetaDataModel::TTAMetaDataModel(const QString &path) :
     MetaDataModel(true)
 {
-    m_tta = new TTAHelper(path);
-    m_tags << new TTAFileTagModel(m_tta, meta_id3v1);
-    m_tags << new TTAFileTagModel(m_tta, meta_id3v2);
-    m_tags << new TTAFileTagModel(m_tta, meta_apev2);
+    m_helper = new TTAHelper(path);
+    m_tags << new TTAFileTagModel(m_helper, meta_id3v1);
+    m_tags << new TTAFileTagModel(m_helper, meta_id3v2);
+    m_tags << new TTAFileTagModel(m_helper, meta_apev2);
 }
 
 TTAMetaDataModel::~TTAMetaDataModel()
 {
     while(!m_tags.isEmpty())
         delete m_tags.takeFirst();
-    delete m_tta;
+    delete m_helper;
 }
 
 QList<TagModel* > TTAMetaDataModel::tags() const
@@ -25,7 +25,7 @@ QList<TagModel* > TTAMetaDataModel::tags() const
 TTAFileTagModel::TTAFileTagModel(TTAHelper* tta, stdio_meta_type stdio_meta)
     : TagModel()
 {
-    m_tta = tta;
+    m_helper = tta;
     m_stdio_meta = stdio_meta;
 }
 
@@ -59,9 +59,9 @@ QList<Qmmp::MetaData> TTAFileTagModel::keys() const
 
 QString TTAFileTagModel::value(Qmmp::MetaData key) const
 {
-    if(m_tta)
+    if(m_helper)
     {
-        const QVariantMap &meta = m_tta->readTags(m_stdio_meta);
+        const QVariantMap &meta = m_helper->readTags(m_stdio_meta);
         switch((int) key)
         {
         case Qmmp::TITLE: return meta.value("title", QString()).toString();

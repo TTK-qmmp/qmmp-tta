@@ -45,7 +45,7 @@ public:
     TTAHelper(const QString &url);
     ~TTAHelper();
 
-    void close();
+    void deinit();
 
     bool initialize();
     int totalTime() const;
@@ -64,4 +64,4 @@ private:
     tta_info_t* m_info;
 };
 
-#endif // TTAHELPER_H
+#endif
