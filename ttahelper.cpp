@@ -9,7 +9,7 @@ extern "C" {
 TTAHelper::TTAHelper(const QString &url)
 {
     m_path = url;
-    m_info = (tta_info_t*)calloc(sizeof(tta_info_t), 1);
+    m_info = (decode_info*)calloc(sizeof(decode_info), 1);
     m_info->buffer = (char*)malloc(sizeof(char) * PCM_BUFFER_LENGTH * MAX_BSIZE * MAX_NCH);
 }
 
@@ -23,82 +23,81 @@ void TTAHelper::deinit()
     if(m_info)
     {
         free(m_info->buffer);
-        player_stop(&m_info->tta);
-        close_tta_file(&m_info->tta);
+        player_stop(&m_info->input);
+        close_tta_file(&m_info->input);
         free(m_info);
     }
 }
 
 bool TTAHelper::initialize()
 {
-    if(open_tta_file(m_path.toLocal8Bit().constData(), &m_info->tta, 0) != 0)
+    if(open_tta_file(m_path.toLocal8Bit().constData(), &m_info->input, 0) != 0)
     {
         qWarning("TTAHelper: open_tta_file failed");
         return false;
     }
 
-    if(player_init(&m_info->tta) != 0)
+    if(player_init(&m_info->input) != 0)
     {
         qWarning("TTAHelper: player_init invalid");
         return false;
     }
 
-    m_info->startsample = 0;
-    m_info->endsample = m_info->tta.DATALENGTH - 1;
+    m_info->end_sample = m_info->input.DATALENGTH - 1;
 
     return true;
 }
 
 int TTAHelper::totalTime() const
 {
-    return m_info->tta.LENGTH * 1000;
+    return m_info->input.LENGTH * 1000;
 }
 
 void TTAHelper::seek(qint64 time)
 {
     const int total = totalTime();
-    if(total == 0 || m_info->endsample == 0)
+    if(total == 0 || m_info->end_sample == 0)
     {
         return;
     }
 
-    const int sample = time * 1.0 / total * m_info->endsample;
-    m_info->samples_to_skip = set_position(&m_info->tta, sample);
+    const int sample = time * 1.0 / total * m_info->end_sample;
+    m_info->samples_to_skip = set_position(&m_info->input, sample);
     if(m_info->samples_to_skip < 0)
     {
         return;
     }
 
-    m_info->currentsample = sample;
+    m_info->current_sample = sample;
     m_info->remaining = 0;
 }
 
 int TTAHelper::bitrate() const
 {
-    return m_info->tta.BITRATE;
+    return m_info->input.BITRATE;
 }
 
 int TTAHelper::sampleRate() const
 {
-    return m_info->tta.SAMPLERATE;
+    return m_info->input.SAMPLERATE;
 }
 
 int TTAHelper::channels() const
 {
-    return m_info->tta.NCH;
+    return m_info->input.NCH;
 }
 
 int TTAHelper::bitsPerSample() const
 {
-    return m_info->tta.BPS;
+    return m_info->input.BPS;
 }
 
 int TTAHelper::read(unsigned char *buf, int size)
 {
     int samplesize = channels() * bitsPerSample() / 8;
-    if(m_info->currentsample + size / samplesize > m_info->endsample)
+    if(m_info->current_sample + size / samplesize > m_info->end_sample)
     {
-        size = (m_info->endsample - m_info->currentsample + 1) * samplesize;
+        size = (m_info->end_sample - m_info->current_sample + 1) * samplesize;
         if(size <= 0)
         {
             return 0;
@@ -140,7 +139,7 @@ int TTAHelper::read(unsigned char *buf, int size)
 
         if(size > 0 && !m_info->remaining)
         {
-            m_info->remaining = get_samples(&m_info->tta, m_info->buffer);
+            m_info->remaining = get_samples(&m_info->input, m_info->buffer);
             if(m_info->remaining <= 0)
             {
                 break;
@@ -148,7 +147,7 @@ int TTAHelper::read(unsigned char *buf, int size)
         }
     }
 
-    m_info->currentsample += (initsize - size) / samplesize;
+    m_info->current_sample += (initsize - size) / samplesize;
     return initsize - size;
 }
 

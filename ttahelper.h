@@ -20,21 +20,19 @@
 #define TTAHELPER_H
 
 extern "C" {
-#include "ttadec.h"
+#include <libtta/ttadec.h>
 #include "stdio_meta_type.h"
 }
 #include <QVariantMap>
 
 typedef struct {
-    tta_info tta;
+    tta_info input;
     char* buffer;
     int remaining;
-
     int samples_to_skip;
-    int currentsample;
-    int startsample;
-    int endsample;
-} tta_info_t;
+    int current_sample;
+    int end_sample;
+} decode_info;
 
 /*!
  * @author Greedysky <greedysky@163.com>
@@ -61,7 +59,8 @@ public:
 
 private:
     QString m_path;
-    tta_info_t* m_info;
+    decode_info* m_info;
+
 };
 
 #endif
